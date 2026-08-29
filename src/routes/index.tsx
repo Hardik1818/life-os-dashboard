@@ -64,8 +64,10 @@ function Card({
 function SectionHeader({ title, aside }: { title: string; aside?: React.ReactNode }) {
   return (
     <header className="mb-4 flex items-center justify-between gap-3">
-      <h2 className="text-[17px] font-semibold tracking-tight">{title}</h2>
-      {aside ? <div className="text-xs text-subtle-foreground">{aside}</div> : null}
+      <h2 className="min-w-0 truncate text-[17px] font-semibold tracking-tight">{title}</h2>
+      {aside ? (
+        <div className="hidden shrink-0 text-xs text-subtle-foreground sm:block">{aside}</div>
+      ) : null}
     </header>
   );
 }
@@ -95,7 +97,7 @@ function CheckRow({
         type="button"
         onClick={onToggle}
         aria-pressed={done}
-        className="flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition-colors hover:bg-muted"
+        className="flex min-h-11 w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-muted active:bg-muted"
       >
         <span
           className={`grid size-5 shrink-0 place-items-center rounded-md border transition-colors ${
@@ -149,8 +151,8 @@ function Today() {
         </div>
       </header>
 
-      <div className="grid gap-5 lg:grid-cols-3">
-        <div className="flex flex-col gap-5 lg:col-span-2">
+      <div className="grid min-w-0 gap-5 lg:grid-cols-3">
+        <div className="flex min-w-0 flex-col gap-5 lg:col-span-2">
           <Card>
             <SectionHeader title="Needs attention" aside="Rule-based · always offline" />
             <ul className="flex flex-col gap-2.5">
@@ -159,12 +161,14 @@ function Today() {
                   key={item.id}
                   className="flex items-center gap-3 overflow-hidden rounded-xl bg-muted/60 pr-3"
                 >
-                  <span className={`h-full w-1 self-stretch ${severityBar[item.severity]}`} />
+                  <span className={`h-full w-1 shrink-0 self-stretch ${severityBar[item.severity]}`} />
                   <div className="min-w-0 flex-1 py-3">
                     <p className="truncate text-sm font-medium">{item.title}</p>
                     <p className="mt-0.5 truncate text-xs text-muted-foreground">{item.detail}</p>
                   </div>
-                  <Chip severity={item.severity} />
+                  <span className="shrink-0">
+                    <Chip severity={item.severity} />
+                  </span>
                 </li>
               ))}
             </ul>
@@ -176,17 +180,19 @@ function Today() {
               {priorities.map((p, i) => (
                 <li
                   key={p.id}
-                  className="flex items-center gap-4 rounded-xl border border-border p-4 transition-shadow hover:shadow-[var(--shadow-lift)]"
+                  className="flex items-center gap-3 rounded-xl border border-border p-4 transition-shadow hover:shadow-[var(--shadow-lift)] sm:gap-4"
                 >
                   <span className="tabular grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-sm font-semibold text-accent-foreground">
                     {i + 1}
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[15px] font-medium">{p.title}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{p.meta}</p>
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">{p.meta}</p>
                   </div>
-                  <Chip severity={p.severity} />
-                  <ChevronRight className="size-4 shrink-0 text-subtle-foreground" />
+                  <span className="shrink-0">
+                    <Chip severity={p.severity} />
+                  </span>
+                  <ChevronRight className="hidden size-4 shrink-0 text-subtle-foreground sm:block" />
                 </li>
               ))}
             </ol>
@@ -198,13 +204,13 @@ function Today() {
               {schedule.map((s) => (
                 <li
                   key={s.id}
-                  className="flex items-center gap-4 border-b border-border py-3 last:border-0"
+                  className="flex items-center gap-3 border-b border-border py-3.5 last:border-0 sm:gap-4 sm:py-3"
                 >
-                  <span className="tabular w-12 shrink-0 text-sm text-muted-foreground">
+                  <span className="tabular w-11 shrink-0 text-sm text-muted-foreground sm:w-12">
                     {s.time}
                   </span>
                   <span
-                    className={`h-8 w-1 rounded-full ${
+                    className={`h-8 w-1 shrink-0 rounded-full ${
                       s.kind === "block" ? "bg-primary" : "bg-clear"
                     }`}
                   />
@@ -223,7 +229,7 @@ function Today() {
           </Card>
         </div>
 
-        <div className="flex flex-col gap-5">
+        <div className="flex min-w-0 flex-col gap-5">
           <Card>
             <SectionHeader
               title="Tasks"
