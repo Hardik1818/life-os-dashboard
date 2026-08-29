@@ -64,8 +64,10 @@ function Card({
 function SectionHeader({ title, aside }: { title: string; aside?: React.ReactNode }) {
   return (
     <header className="mb-4 flex items-center justify-between gap-3">
-      <h2 className="text-[17px] font-semibold tracking-tight">{title}</h2>
-      {aside ? <div className="text-xs text-subtle-foreground">{aside}</div> : null}
+      <h2 className="min-w-0 truncate text-[17px] font-semibold tracking-tight">{title}</h2>
+      {aside ? (
+        <div className="hidden shrink-0 text-xs text-subtle-foreground sm:block">{aside}</div>
+      ) : null}
     </header>
   );
 }
