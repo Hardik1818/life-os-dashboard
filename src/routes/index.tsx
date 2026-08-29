@@ -151,8 +151,8 @@ function Today() {
         </div>
       </header>
 
-      <div className="grid gap-5 lg:grid-cols-3">
-        <div className="flex flex-col gap-5 lg:col-span-2">
+      <div className="grid min-w-0 gap-5 lg:grid-cols-3">
+        <div className="flex min-w-0 flex-col gap-5 lg:col-span-2">
           <Card>
             <SectionHeader title="Needs attention" aside="Rule-based · always offline" />
             <ul className="flex flex-col gap-2.5">
@@ -229,7 +229,7 @@ function Today() {
           </Card>
         </div>
 
-        <div className="flex flex-col gap-5">
+        <div className="flex min-w-0 flex-col gap-5">
           <Card>
             <SectionHeader
               title="Tasks"
