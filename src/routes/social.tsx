@@ -42,13 +42,13 @@ function SocialPage() {
       />
 
       <div className="grid min-w-0 gap-5 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card className="min-w-0 lg:col-span-2">
           <SectionHeader title="Your circle" aside="3 people · all opt-in" />
           <ul className="grid min-w-0 gap-3 sm:grid-cols-2">
             {people.map((p) => (
               <li
                 key={p.id}
-                className="flex items-center gap-3.5 rounded-xl border border-border p-4 transition-shadow hover:shadow-[var(--shadow-lift)]"
+                className="flex min-w-0 items-center gap-3.5 rounded-xl border border-border p-4 transition-shadow hover:shadow-[var(--shadow-lift)]"
               >
                 <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-sm font-semibold text-accent-foreground">
                   {p.name.slice(0, 1)}
