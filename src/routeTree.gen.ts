@@ -15,8 +15,8 @@ import { Route as HabitsRouteImport } from './routes/habits'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as JournalRouteImport } from './routes/journal'
+import { Route as NewsRouteImport } from './routes/news'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as SocialRouteImport } from './routes/social'
 import { Route as TasksRouteImport } from './routes/tasks'
 
 const IndexRoute = IndexRouteImport.update({
@@ -49,14 +49,14 @@ const JournalRoute = JournalRouteImport.update({
   path: '/journal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NewsRoute = NewsRouteImport.update({
+  id: '/news',
+  path: '/news',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SocialRoute = SocialRouteImport.update({
-  id: '/social',
-  path: '/social',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TasksRoute = TasksRouteImport.update({
@@ -72,8 +72,8 @@ export interface FileRoutesByFullPath {
   '/health': typeof HealthRoute
   '/insights': typeof InsightsRoute
   '/journal': typeof JournalRoute
+  '/news': typeof NewsRoute
   '/settings': typeof SettingsRoute
-  '/social': typeof SocialRoute
   '/tasks': typeof TasksRoute
 }
 export interface FileRoutesByTo {
@@ -83,8 +83,8 @@ export interface FileRoutesByTo {
   '/health': typeof HealthRoute
   '/insights': typeof InsightsRoute
   '/journal': typeof JournalRoute
+  '/news': typeof NewsRoute
   '/settings': typeof SettingsRoute
-  '/social': typeof SocialRoute
   '/tasks': typeof TasksRoute
 }
 export interface FileRoutesById {
@@ -95,8 +95,8 @@ export interface FileRoutesById {
   '/health': typeof HealthRoute
   '/insights': typeof InsightsRoute
   '/journal': typeof JournalRoute
+  '/news': typeof NewsRoute
   '/settings': typeof SettingsRoute
-  '/social': typeof SocialRoute
   '/tasks': typeof TasksRoute
 }
 export interface FileRouteTypes {
@@ -108,8 +108,8 @@ export interface FileRouteTypes {
     | '/health'
     | '/insights'
     | '/journal'
+    | '/news'
     | '/settings'
-    | '/social'
     | '/tasks'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -119,8 +119,8 @@ export interface FileRouteTypes {
     | '/health'
     | '/insights'
     | '/journal'
+    | '/news'
     | '/settings'
-    | '/social'
     | '/tasks'
   id:
     | '__root__'
@@ -130,8 +130,8 @@ export interface FileRouteTypes {
     | '/health'
     | '/insights'
     | '/journal'
+    | '/news'
     | '/settings'
-    | '/social'
     | '/tasks'
   fileRoutesById: FileRoutesById
 }
@@ -142,8 +142,8 @@ export interface RootRouteChildren {
   HealthRoute: typeof HealthRoute
   InsightsRoute: typeof InsightsRoute
   JournalRoute: typeof JournalRoute
+  NewsRoute: typeof NewsRoute
   SettingsRoute: typeof SettingsRoute
-  SocialRoute: typeof SocialRoute
   TasksRoute: typeof TasksRoute
 }
 
@@ -191,18 +191,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JournalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/news': {
+      id: '/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof NewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/social': {
-      id: '/social'
-      path: '/social'
-      fullPath: '/social'
-      preLoaderRoute: typeof SocialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tasks': {
@@ -222,8 +222,8 @@ const rootRouteChildren: RootRouteChildren = {
   HealthRoute: HealthRoute,
   InsightsRoute: InsightsRoute,
   JournalRoute: JournalRoute,
+  NewsRoute: NewsRoute,
   SettingsRoute: SettingsRoute,
-  SocialRoute: SocialRoute,
   TasksRoute: TasksRoute,
 }
 export const routeTree = rootRouteImport
