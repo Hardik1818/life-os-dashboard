@@ -4,6 +4,7 @@ import { Bell, Database, Moon, ShieldCheck, Sun, User } from "lucide-react";
 
 import { AppShell } from "@/components/life-os/AppShell";
 import { Card, SectionHeader, PageHeader } from "@/components/life-os/ui";
+import { useTheme } from "@/hooks/use-theme";
 
 const title = "Settings — Life OS";
 const description = "Profile, appearance, notifications and data preferences for Life OS.";
