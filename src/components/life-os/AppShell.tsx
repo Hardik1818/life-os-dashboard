@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   CalendarDays,
@@ -32,7 +32,11 @@ const mobileNav = [
   { label: "Calendar", icon: CalendarDays, to: "/calendar" as const },
   { label: "Tasks", icon: CheckSquare, to: "/tasks" as const },
   { label: "Insights", icon: LineChart, to: "/insights" as const },
-  { label: "More", icon: MoreHorizontal, to: "/settings" as const },
+];
+
+const moreNav = [
+  ...secondaryNav,
+  { label: "Settings", icon: Settings, to: "/settings" as const },
 ];
 
 type NavTo = "/" | "/calendar" | "/tasks" | "/insights" | "/journal" | "/habits" | "/health" | "/news" | "/settings";
@@ -64,6 +68,8 @@ function NavItem({
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const [moreOpen, setMoreOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       <aside className="fixed inset-y-0 left-0 hidden w-[248px] flex-col border-r border-border bg-card px-4 py-6 lg:flex">
@@ -112,8 +118,45 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Link>
             </li>
           ))}
+          <li>
+            <button
+              type="button"
+              onClick={() => setMoreOpen(true)}
+              aria-haspopup="dialog"
+              aria-expanded={moreOpen}
+              className="flex w-full flex-col items-center gap-1 py-2.5 text-[11px] text-subtle-foreground"
+            >
+              <MoreHorizontal className="size-5" strokeWidth={1.8} />
+              More
+            </button>
+          </li>
         </ul>
       </nav>
+
+      {moreOpen ? (
+        <div className="fixed inset-0 z-30 lg:hidden">
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={() => setMoreOpen(false)}
+            className="absolute inset-0 bg-foreground/30 backdrop-blur-[2px]"
+          />
+          <div
+            role="dialog"
+            aria-label="More pages"
+            className="absolute inset-x-0 bottom-0 rounded-t-2xl border-t border-border bg-card px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3"
+          >
+            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-border" />
+            <nav className="flex flex-col gap-1">
+              {moreNav.map((item) => (
+                <div key={item.label} onClick={() => setMoreOpen(false)}>
+                  <NavItem {...item} />
+                </div>
+              ))}
+            </nav>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
