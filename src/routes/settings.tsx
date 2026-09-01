@@ -129,8 +129,8 @@ function SettingsPage() {
               onChange={(v) => setNotify((n) => ({ ...n, habits: v }))}
             />
             <Toggle
-              label="Social activity"
-              hint="When someone in your circle shares a win"
+              label="News digest"
+              hint="A short morning summary of your saved topics"
               on={notify.social}
               onChange={(v) => setNotify((n) => ({ ...n, social: v }))}
             />
