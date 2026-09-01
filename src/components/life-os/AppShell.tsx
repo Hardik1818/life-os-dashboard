@@ -8,7 +8,7 @@ import {
   NotebookPen,
   Repeat,
   Settings,
-  Share2,
+  Newspaper,
   Sun,
   HeartPulse,
 } from "lucide-react";
@@ -24,7 +24,7 @@ const secondaryNav = [
   { label: "Journal", icon: NotebookPen, to: "/journal" as const },
   { label: "Habits", icon: Repeat, to: "/habits" as const },
   { label: "Health & Mood", icon: HeartPulse, to: "/health" as const },
-  { label: "Social", icon: Share2, to: "/social" as const },
+  { label: "News", icon: Newspaper, to: "/news" as const },
 ];
 
 const mobileNav = [
@@ -35,7 +35,7 @@ const mobileNav = [
   { label: "More", icon: MoreHorizontal, to: "/settings" as const },
 ];
 
-type NavTo = "/" | "/calendar" | "/tasks" | "/insights" | "/journal" | "/habits" | "/health" | "/social" | "/settings";
+type NavTo = "/" | "/calendar" | "/tasks" | "/insights" | "/journal" | "/habits" | "/health" | "/news" | "/settings";
 
 function NavItem({
   label,
