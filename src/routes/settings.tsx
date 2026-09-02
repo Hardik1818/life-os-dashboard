@@ -147,8 +147,8 @@ function SettingsPage() {
               onChange={(v) => setPrivacy((p) => ({ ...p, analytics: v }))}
             />
             <Toggle
-              label="Share streaks with my circle"
-              hint="Only people you explicitly invited"
+              label="Show streaks on Today"
+              hint="Display habit streak counts on the dashboard"
               on={privacy.shareStreaks}
               onChange={(v) => setPrivacy((p) => ({ ...p, shareStreaks: v }))}
             />
