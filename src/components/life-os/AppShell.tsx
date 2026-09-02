@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   CalendarDays,
@@ -49,17 +49,20 @@ function NavItem({
   label,
   icon: Icon,
   to,
+  onClick,
 }: {
   label: string;
   icon: typeof Sun;
   to: NavTo;
+  onClick?: () => void;
 }) {
   return (
     <Link
       to={to}
       activeOptions={{ exact: to === "/" }}
       aria-current={undefined}
-      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors text-muted-foreground hover:bg-muted hover:text-foreground"
+      onClick={onClick}
+      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors text-muted-foreground hover:bg-muted hover:text-foreground active:scale-[0.98]"
       activeProps={{
         className:
           "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors bg-primary text-primary-foreground font-medium",
@@ -68,6 +71,104 @@ function NavItem({
       <Icon className="size-[18px]" strokeWidth={1.8} />
       {label}
     </Link>
+  );
+}
+
+function MobileMoreDrawer({
+  isOpen,
+  onClose,
+  onTriggerPalette,
+  onLock,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onTriggerPalette: () => void;
+  onLock: () => void;
+}) {
+  const [mounted, setMounted] = useState(false);
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setMounted(true);
+      // Double rAF ensures browser paints initial state before triggering CSS transition
+      const frame = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setAnimate(true));
+      });
+      return () => cancelAnimationFrame(frame);
+    } else {
+      setAnimate(false);
+      const timer = setTimeout(() => setMounted(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!mounted) return null;
+
+  return (
+    <div className="fixed inset-0 z-40 lg:hidden">
+      {/* Backdrop with smooth opacity fade */}
+      <button
+        type="button"
+        aria-label="Close menu"
+        onClick={onClose}
+        className={`absolute inset-0 bg-foreground/35 backdrop-blur-sm transition-opacity duration-300 ease-out ${
+          animate ? "opacity-100" : "opacity-0"
+        }`}
+      />
+
+      {/* Drawer Panel with spring-like smooth slide-up */}
+      <div
+        role="dialog"
+        aria-label="More pages"
+        className={`absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-3xl border-t border-border bg-card/98 px-5 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-3 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform ${
+          animate ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        {/* Grab Handle */}
+        <div className="mx-auto mb-3.5 h-1.5 w-12 rounded-full bg-border transition-colors hover:bg-muted-foreground/30" />
+
+        {/* Quick Command Trigger */}
+        <button
+          type="button"
+          onClick={() => {
+            onClose();
+            onTriggerPalette();
+          }}
+          className="mb-3.5 flex w-full items-center justify-between rounded-xl border border-border bg-muted/70 px-3.5 py-2.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+        >
+          <span className="flex items-center gap-2">
+            <Command className="size-3.5 text-primary" />
+            <span>Quick Command Palette (⌘K)</span>
+          </span>
+          <kbd className="rounded border border-border bg-card px-1.5 py-0.5 font-mono">
+            ⌘K
+          </kbd>
+        </button>
+
+        <nav className="flex flex-col gap-1">
+          {moreNav.map((item) => (
+            <NavItem
+              key={item.label}
+              {...item}
+              onClick={onClose}
+            />
+          ))}
+
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              onLock();
+            }}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors text-destructive hover:bg-destructive/10 active:scale-[0.98] text-left"
+          >
+            <Lock className="size-[18px]" strokeWidth={1.8} />
+            <span>Lock Dashboard</span>
+          </button>
+        </nav>
+      </div>
+    </div>
   );
 }
 
@@ -160,7 +261,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={() => setMoreOpen(true)}
               aria-haspopup="dialog"
               aria-expanded={moreOpen}
-              className="flex w-full flex-col items-center gap-1 py-2.5 text-[11px] text-subtle-foreground"
+              className="flex w-full flex-col items-center gap-1 py-2.5 text-[11px] text-subtle-foreground active:scale-95 transition-transform"
             >
               <MoreHorizontal className="size-5" strokeWidth={1.8} />
               More
@@ -170,57 +271,12 @@ export function AppShell({ children }: { children: ReactNode }) {
       </nav>
 
       {/* Mobile More Sheet */}
-      {moreOpen ? (
-        <div className="fixed inset-0 z-30 lg:hidden">
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={() => setMoreOpen(false)}
-            className="absolute inset-0 bg-foreground/30 backdrop-blur-[2px]"
-          />
-          <div
-            role="dialog"
-            aria-label="More pages"
-            className="absolute inset-x-0 bottom-0 rounded-t-2xl border-t border-border bg-card px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3"
-          >
-            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-border" />
-            <button
-              type="button"
-              onClick={() => {
-                setMoreOpen(false);
-                triggerPalette();
-              }}
-              className="mb-3 flex w-full items-center justify-between rounded-xl border border-border bg-muted/60 px-3 py-2.5 text-xs font-medium text-foreground"
-            >
-              <span className="flex items-center gap-2">
-                <Command className="size-3.5 text-primary" />
-                <span>Quick Command Palette (⌘K)</span>
-              </span>
-              <kbd className="rounded border border-border bg-card px-1.5 py-0.5 font-mono">
-                ⌘K
-              </kbd>
-            </button>
-            <nav className="flex flex-col gap-1">
-              {moreNav.map((item) => (
-                <div key={item.label} onClick={() => setMoreOpen(false)}>
-                  <NavItem {...item} />
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => {
-                  setMoreOpen(false);
-                  lock();
-                }}
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors text-destructive hover:bg-destructive/10 text-left"
-              >
-                <Lock className="size-[18px]" strokeWidth={1.8} />
-                <span>Lock Dashboard</span>
-              </button>
-            </nav>
-          </div>
-        </div>
-      ) : null}
+      <MobileMoreDrawer
+        isOpen={moreOpen}
+        onClose={() => setMoreOpen(false)}
+        onTriggerPalette={triggerPalette}
+        onLock={lock}
+      />
     </div>
   );
 }
