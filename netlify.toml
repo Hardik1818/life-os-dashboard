@@ -1,10 +1,9 @@
 [build]
-  command = "npm install && npm run build"
+  command = "bash netlify-build.sh"
   publish = ".output/public"
 
 [build.environment]
   NODE_VERSION = "20"
-  NODE_VERSION_CHECK = "20"
 
 [[redirects]]
   from = "/*"
