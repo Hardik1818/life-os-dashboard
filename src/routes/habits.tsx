@@ -222,7 +222,7 @@ function HabitsPage() {
                         aria-label={`Delete habit ${h.title}`}
                         title="Delete habit"
                         onClick={() => deleteHabitMutation.mutate(h.id)}
-                        className="shrink-0 p-1.5 text-subtle-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+                        className="shrink-0 rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95"
                       >
                         <Trash2 className="size-4" />
                       </button>

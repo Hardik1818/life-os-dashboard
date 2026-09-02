@@ -1,10 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
 
 import { AppShell } from "@/components/life-os/AppShell";
 import { Card, SectionHeader, PageHeader } from "@/components/life-os/ui";
 import { getAppsScriptUrl } from "@/integrations/appscript/client";
-import { useJournal, useAddJournalEntry, todayISO } from "@/lib/life-os-queries";
+import {
+  useJournal,
+  useAddJournalEntry,
+  useDeleteJournalEntry,
+  todayISO,
+} from "@/lib/life-os-queries";
 
 const title = "Journal — Life OS";
 const description =
@@ -38,64 +44,71 @@ function formatDisplayDate(iso: string) {
       !isNaN(m) &&
       !isNaN(d)
     ) {
-      const date = new Date(y, m - 1, d);
-      return date.toLocaleDateString("en-GB", {
-        weekday: "long",
+      return new Date(y, m - 1, d).toLocaleDateString("en-GB", {
+        weekday: "short",
         day: "numeric",
-        month: "long",
+        month: "short",
       });
     }
-    return iso;
   } catch {
-    return iso;
+    // fallback
   }
+  return iso;
 }
 
 function JournalPage() {
   const { data: entries = [], isLoading } = useJournal();
   const addEntryMutation = useAddJournalEntry();
-
-  const isConnected = !!getAppsScriptUrl();
+  const deleteEntryMutation = useDeleteJournalEntry();
 
   const [text, setText] = useState("");
-  const [mood, setMood] = useState<(typeof moods)[number]>("Calm");
+  const [mood, setMood] = useState<(typeof moods)[number]>("Focused");
+  const [savedStatus, setSavedStatus] = useState<string | null>(null);
 
-  const save = () => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    addEntryMutation.mutate({
-      body: trimmed,
-      mood,
-      entryDate: todayISO(),
-    });
-    setText("");
+  const save = async () => {
+    if (!text.trim()) return;
+    try {
+      await addEntryMutation.mutateAsync({
+        body: text.trim(),
+        mood,
+        entryDate: todayISO(),
+      });
+      setText("");
+      setSavedStatus(
+        getAppsScriptUrl()
+          ? "Saved and synced with Google Sheets!"
+          : "Saved to local journal!"
+      );
+      setTimeout(() => setSavedStatus(null), 3000);
+    } catch {
+      setSavedStatus("Failed to save entry.");
+    }
   };
 
   return (
     <AppShell>
       <PageHeader
         title="Journal"
-        subtitle={
-          isConnected
-            ? "Private by default. Synced securely to your private Google Sheet."
-            : "Private by default. Stored safely on this device in local storage."
-        }
+        subtitle="Unload thoughts, reflect on what happened, and track your mood over time."
       />
 
-      <div className="grid min-w-0 gap-5 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <SectionHeader title="New entry" aside="No streak pressure" />
-          <div className="mb-3 flex flex-wrap gap-1.5" role="group" aria-label="Select mood">
+      <div className="grid min-w-0 gap-5 lg:grid-cols-2">
+        <Card>
+          <SectionHeader
+            title="Today's reflection"
+            aside={savedStatus ? <span className="text-clear">{savedStatus}</span> : "Private entry"}
+          />
+          <div className="mb-3 flex flex-wrap gap-1.5">
             {moods.map((m) => (
               <button
                 key={m}
                 type="button"
                 aria-pressed={mood === m}
                 onClick={() => setMood(m)}
-                className={`min-h-9 rounded-full px-3.5 text-xs font-medium transition-colors ${
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                   mood === m
                     ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:text-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
                 }`}
               >
                 {m}
@@ -134,18 +147,29 @@ function JournalPage() {
           ) : (
             <ul className="flex flex-col gap-3">
               {entries.map((e) => (
-                <li key={e.id} className="rounded-xl border border-border p-3.5">
+                <li key={e.id} className="rounded-xl border border-border p-3.5 transition-colors hover:border-border/80">
                   <div className="flex items-center justify-between gap-2">
                     <p className="truncate text-xs font-medium text-subtle-foreground">
                       {formatDisplayDate(e.entry_date)}
                     </p>
-                    {e.mood ? (
-                      <span className="shrink-0 rounded-full bg-primary-soft px-2.5 py-0.5 text-[11px] font-medium text-accent-foreground">
-                        {e.mood}
-                      </span>
-                    ) : null}
+                    <div className="flex items-center gap-2">
+                      {e.mood ? (
+                        <span className="shrink-0 rounded-full bg-primary-soft px-2.5 py-0.5 text-[11px] font-medium text-accent-foreground">
+                          {e.mood}
+                        </span>
+                      ) : null}
+                      <button
+                        type="button"
+                        aria-label="Delete entry"
+                        title="Delete entry"
+                        onClick={() => deleteEntryMutation.mutate(e.id)}
+                        className="shrink-0 rounded-lg p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </button>
+                    </div>
                   </div>
-                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     {e.body}
                   </p>
                 </li>

@@ -272,10 +272,10 @@ function NewsPage() {
                   </div>
                   <button
                     type="button"
-                    title="Mark as read / delete"
+                    title="Remove from saved"
                     aria-label="Delete saved article"
                     onClick={() => removeSaved(item.id)}
-                    className="shrink-0 p-1.5 text-subtle-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+                    className="shrink-0 rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95"
                   >
                     <Trash2 className="size-3.5" />
                   </button>

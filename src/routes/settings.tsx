@@ -22,6 +22,7 @@ import { AppShell } from "@/components/life-os/AppShell";
 import { Card, SectionHeader, PageHeader } from "@/components/life-os/ui";
 import { useTheme } from "@/hooks/use-theme";
 import { useLockAuth } from "@/hooks/use-lock-auth";
+import { useUserProfile } from "@/hooks/use-user-profile";
 import {
   getAppsScriptUrl,
   setAppsScriptUrl,
@@ -30,7 +31,7 @@ import { useSyncAppsScript } from "@/lib/life-os-queries";
 import { useQueryClient } from "@tanstack/react-query";
 
 const title = "Settings — Life OS";
-const description = "Google Apps Script sync, security passcode, JSON backup/restore, appearance, and privacy.";
+const description = "Google Apps Script sync, security passcode, profile name, JSON backup/restore, appearance, and privacy.";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -95,6 +96,7 @@ const STORAGE_KEYS = [
 function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const { changePasscode, lock } = useLockAuth();
+  const { userName, updateUserName } = useUserProfile();
   const syncMutation = useSyncAppsScript();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -104,6 +106,10 @@ function SettingsPage() {
   const [backupStatus, setBackupStatus] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
 
+  // Profile Name state
+  const [nameInput, setNameInput] = useState(userName);
+  const [nameStatus, setNameStatus] = useState<string | null>(null);
+
   // Security passcode state
   const [newPasscode, setNewPasscode] = useState("");
   const [passcodeStatus, setPasscodeStatus] = useState<string | null>(null);
@@ -112,6 +118,13 @@ function SettingsPage() {
   const [privacy, setPrivacy] = useState({ analytics: false, shareStreaks: true });
 
   const isConnected = !!scriptUrl.trim();
+
+  const handleSaveName = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateUserName(nameInput);
+    setNameStatus("Name updated!");
+    setTimeout(() => setNameStatus(null), 2500);
+  };
 
   const handleSaveUrl = (e: React.FormEvent) => {
     e.preventDefault();
@@ -215,14 +228,91 @@ function SettingsPage() {
     }
   };
 
+  const userInitials = userName.slice(0, 2).toUpperCase() || "U";
+
   return (
     <AppShell>
       <PageHeader
         title="Settings"
-        subtitle="Manage your Google Apps Script backend, security passcode, and database backups."
+        subtitle="Manage your profile name, Google Apps Script backend, security passcode, and database backups."
       />
 
       <div className="grid min-w-0 gap-5 lg:grid-cols-2">
+        {/* Profile Card */}
+        <Card>
+          <SectionHeader title="Profile & Display Name" />
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-4">
+              <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary text-base font-bold text-primary-foreground shadow-sm">
+                {userInitials}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-[15px] font-semibold">{userName}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  Personal Life OS · Master Security Protected
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSaveName} className="flex flex-col gap-2">
+              <label className="text-xs font-medium text-foreground">Change Display Name</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  placeholder="Enter your name (default: User)…"
+                  className="min-h-10 w-full rounded-xl border border-border bg-background px-3 text-xs outline-none focus:border-primary"
+                />
+                <button
+                  type="submit"
+                  disabled={!nameInput.trim() || nameInput.trim() === userName}
+                  className="min-h-10 shrink-0 rounded-xl bg-primary px-4 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                >
+                  Save
+                </button>
+              </div>
+              {nameStatus ? (
+                <p className="text-xs font-medium text-clear">{nameStatus}</p>
+              ) : (
+                <p className="text-[11px] text-subtle-foreground">
+                  Shown on your dashboard greeting and daily command center.
+                </p>
+              )}
+            </form>
+          </div>
+        </Card>
+
+        {/* Appearance Card */}
+        <Card>
+          <SectionHeader title="Appearance" />
+          <div className="grid grid-cols-2 gap-2">
+            {(
+              [
+                { id: "light", label: "Light", icon: Sun },
+                { id: "dark", label: "Dark", icon: Moon },
+              ] as const
+            ).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                aria-pressed={theme === t.id}
+                onClick={() => setTheme(t.id)}
+                className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border text-sm font-medium transition-colors ${
+                  theme === t.id
+                    ? "border-primary bg-primary-soft text-accent-foreground"
+                    : "border-border bg-card text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                <t.icon className="size-4" /> {t.label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-subtle-foreground">
+            Applies instantly and is remembered on this device across refreshes.
+          </p>
+        </Card>
+
         {/* Security & Access Lock Card */}
         <Card className="lg:col-span-2">
           <SectionHeader
@@ -414,52 +504,6 @@ function SettingsPage() {
           {backupStatus ? (
             <p className="mt-3 text-xs font-medium text-clear">{backupStatus}</p>
           ) : null}
-        </Card>
-
-        {/* Profile Card */}
-        <Card>
-          <SectionHeader title="Profile" />
-          <div className="flex items-center gap-4">
-            <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-primary text-lg font-semibold text-primary-foreground">
-              <User className="size-6" />
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-[15px] font-medium">Hardik</p>
-              <p className="truncate text-xs text-muted-foreground">
-                Personal Life OS · Master Security Protected
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        {/* Appearance Card */}
-        <Card>
-          <SectionHeader title="Appearance" />
-          <div className="grid grid-cols-2 gap-2">
-            {(
-              [
-                { id: "light", label: "Light", icon: Sun },
-                { id: "dark", label: "Dark", icon: Moon },
-              ] as const
-            ).map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                aria-pressed={theme === t.id}
-                onClick={() => setTheme(t.id)}
-                className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border text-sm font-medium transition-colors ${
-                  theme === t.id
-                    ? "border-primary bg-primary-soft text-accent-foreground"
-                    : "border-border bg-card text-muted-foreground hover:bg-muted"
-                }`}
-              >
-                <t.icon className="size-4" /> {t.label}
-              </button>
-            ))}
-          </div>
-          <p className="mt-3 text-xs text-subtle-foreground">
-            Applies instantly and is remembered on this device.
-          </p>
         </Card>
 
         {/* Notifications Card */}

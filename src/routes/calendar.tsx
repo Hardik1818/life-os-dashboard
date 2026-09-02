@@ -267,8 +267,9 @@ function CalendarPage() {
                     <button
                       type="button"
                       aria-label="Delete event"
+                      title="Delete event"
                       onClick={() => deleteEventMutation.mutate(u.id)}
-                      className="shrink-0 p-2 text-subtle-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+                      className="shrink-0 rounded-lg p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95"
                     >
                       <Trash2 className="size-4" />
                     </button>

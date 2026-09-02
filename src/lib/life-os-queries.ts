@@ -520,6 +520,22 @@ export function useAddJournalEntry() {
   });
 }
 
+export function useDeleteJournalEntry() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const current = getLocal<JournalRow[]>(STORAGE_KEYS.JOURNAL, DEFAULT_JOURNAL);
+      const updated = current.filter((j) => j.id !== id);
+      setLocal(STORAGE_KEYS.JOURNAL, updated);
+
+      if (getAppsScriptUrl()) {
+        callAppsScript("saveJournal", { entries: updated }).catch(console.error);
+      }
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["journal"] }),
+  });
+}
+
 /* -------------------------- Calendar Events Hooks -------------------------- */
 
 export function useCalendarEvents() {
