@@ -1,9 +1,10 @@
 [build]
-  command = "npm run build"
+  command = "npm install && npm run build"
   publish = ".output/public"
 
 [build.environment]
   NODE_VERSION = "20"
+  NODE_VERSION_CHECK = "20"
 
 [[redirects]]
   from = "/*"
