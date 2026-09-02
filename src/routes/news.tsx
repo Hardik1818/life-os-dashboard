@@ -83,7 +83,7 @@ function NewsPage() {
           <button
             key={cat}
             type="button"
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+            className={`flex min-h-9 shrink-0 items-center rounded-full px-3.5 text-xs font-medium transition-colors ${
               i === 0
                 ? "bg-primary text-primary-foreground"
                 : "border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
